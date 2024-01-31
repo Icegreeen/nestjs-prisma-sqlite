@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { BookDTO } from './book.dto';
 import { PrismaService } from 'src/database/PrismaService';
@@ -8,7 +8,6 @@ export class BookService {
     constructor(private prisma: PrismaService) {}
 
     async create(data: BookDTO) {
-
         const bookExists = await this.prisma.book.findFirst({
             where: {
                 bar_code: data.bar_code
@@ -16,7 +15,7 @@ export class BookService {
         });
 
         if(bookExists) {
-            throw new Error('Book already exists!');
+            throw new ConflictException('Book already exists!');
         }
 
         const book = await this.prisma.book.create({
